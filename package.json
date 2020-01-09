@@ -1,0 +1,29 @@
+{
+  "description": "Adds support for identifying and managing script Characters.",
+  "name": "ep_script_characters",
+  "version": "0.0.1",
+  "author": {
+    "name": "Guilherme Goncalves",
+    "email": "inacio.guilherme@gmail.com"
+  },
+  "contributors": [
+    {
+      "name": "Guilherme Goncalves",
+      "email": "inacio.guilherme@gmail.com"
+    },
+    {
+      "name": "Joas Souza",
+      "email": "joassouzasantos@gmail.com"
+    }
+  ],
+  "dependencies": {},
+  "devDependencies": {},
+  "engines": {
+    "node": "*"
+  },
+  "homepage": "https://github.com/storytouch/ep_script_characters",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/storytouch/ep_script_characters.git"
+  }
+}

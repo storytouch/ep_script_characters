@@ -1,0 +1,9 @@
+{
+  "parts": [
+    {
+      "name": "script_characters",
+      "client_hooks": {},
+      "hooks": {}
+    }
+  ]
+}
