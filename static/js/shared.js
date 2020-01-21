@@ -7,6 +7,7 @@ var SCENE_ID_PREFIX = 'scid-';
 exports.SCENE_ID_PREFIX = SCENE_ID_PREFIX;
 
 var SCENE_ID_REGEXP = new RegExp('(?:^| )' + SCENE_ID_PREFIX + '[A-Za-z0-9]+');
+exports.SCENE_ID_REGEXP = SCENE_ID_REGEXP;
 
 var isHeading = function(tname) {
   return tname === 'heading';
