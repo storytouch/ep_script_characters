@@ -5,6 +5,8 @@ var utils = require('./utils');
 var generateSceneId = require('./shared').generateSceneId;
 var linesChangedListener = require('ep_comments_page/static/js/linesChangedListener');
 
+var HEADING_WITHOUT_SCENE_ID_SELECTOR = 'heading:not(.scene-id)';
+var LINES_CHANGED_LISTENER_TIMEOUT = 800;
 var SCENE_ID_KEY_ATTRIB = require('./shared').SCENE_ID_KEY_ATTRIB;
 var SCENE_ID_REGEXP = require('./shared').SCENE_ID_REGEXP;
 
@@ -12,27 +14,25 @@ var sceneUniqueIdTagging = function(editorInfo, documentAttributeManager) {
   var self = this;
   self.editorInfo = editorInfo;
   self.attributeManager = documentAttributeManager;
-  linesChangedListener.onLineChanged('heading', this.markScenesWithUniqueId.bind(this));
+  linesChangedListener.onLineChanged(
+    HEADING_WITHOUT_SCENE_ID_SELECTOR,
+    this.markScenesWithUniqueId.bind(this),
+    LINES_CHANGED_LISTENER_TIMEOUT
+  );
 };
 
 sceneUniqueIdTagging.prototype._markSceneWithUniqueId = function(element, $lines) {
   var lineNumber = $lines.index(element);
-  var headingClasses = $(element)
-    .find('heading')
-    .attr('class');
-  var headingAlreadyHasSceneId = SCENE_ID_REGEXP.exec(headingClasses);
-  if (!headingAlreadyHasSceneId) {
-    var sceneId = generateSceneId();
-    this.attributeManager.setAttributeOnLine(lineNumber, SCENE_ID_KEY_ATTRIB, sceneId);
-  }
+  var sceneId = generateSceneId();
+  this.attributeManager.setAttributeOnLine(lineNumber, SCENE_ID_KEY_ATTRIB, sceneId);
 };
 
-sceneUniqueIdTagging.prototype.markScenesWithUniqueId = function(linesToProcess) {
+sceneUniqueIdTagging.prototype.markScenesWithUniqueId = function() {
   var self = this;
   self.editorInfo.ace_inCallStackIfNecessary('markScenesWithUniqueId', function() {
-    var $lines = utils.getPadInner().find('div');
-    var $linesToProcess = linesToProcess ? $(linesToProcess) : $lines;
-    var $headings = $linesToProcess.filter(':has(heading)');
+    var padInner = utils.getPadInner();
+    var $lines = padInner.find('div');
+    var $headings = padInner.find(HEADING_WITHOUT_SCENE_ID_SELECTOR).parent();
     $headings.each(function(index, element) {
       self._markSceneWithUniqueId(element, $lines);
     });
