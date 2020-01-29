@@ -10,10 +10,11 @@ var LINES_CHANGED_LISTENER_TIMEOUT = 800;
 var SCENE_ID_KEY_ATTRIB = require('./shared').SCENE_ID_KEY_ATTRIB;
 var SCENE_ID_REGEXP = require('./shared').SCENE_ID_REGEXP;
 
-var sceneUniqueIdTagging = function(editorInfo, documentAttributeManager) {
+var sceneUniqueIdTagging = function(editorInfo, documentAttributeManager, rep) {
   var self = this;
   self.editorInfo = editorInfo;
   self.attributeManager = documentAttributeManager;
+  self.rep = rep;
   linesChangedListener.onLineChanged(
     HEADING_WITHOUT_SCENE_ID_SELECTOR,
     this.markScenesWithUniqueId.bind(this),
@@ -21,10 +22,28 @@ var sceneUniqueIdTagging = function(editorInfo, documentAttributeManager) {
   );
 };
 
+sceneUniqueIdTagging.prototype._placeCaretOnLine = function(newSelStart, newSelEnd) {
+  var self = this;
+
+  // in case no newSelEnd is provided, place caret at newSelStart
+  newSelEnd = newSelEnd || newSelStart;
+
+  self.editorInfo.ace_inCallStackIfNecessary('SceneMarkPlaceCaretOnLine', function() {
+    self.editorInfo.ace_performSelectionChange(newSelStart, newSelEnd, true);
+    self.editorInfo.ace_updateBrowserSelectionFromRep();
+  });
+};
+
 sceneUniqueIdTagging.prototype._markSceneWithUniqueId = function(element, $lines) {
   var lineNumber = $lines.index(element);
   var sceneId = generateSceneId();
+  var caretLine = this.rep.selStart[0];
+
   this.attributeManager.setAttributeOnLine(lineNumber, SCENE_ID_KEY_ATTRIB, sceneId);
+
+  if (caretLine === lineNumber) {
+    this._placeCaretOnLine([lineNumber, 1]);
+  }
 };
 
 sceneUniqueIdTagging.prototype.markScenesWithUniqueId = function() {
@@ -42,5 +61,6 @@ sceneUniqueIdTagging.prototype.markScenesWithUniqueId = function() {
 exports.init = function() {
   var editorInfo = this.editorInfo;
   var documentAttributeManager = this.documentAttributeManager;
-  return new sceneUniqueIdTagging(editorInfo, documentAttributeManager);
+  var rep = this.rep;
+  return new sceneUniqueIdTagging(editorInfo, documentAttributeManager, rep);
 };
